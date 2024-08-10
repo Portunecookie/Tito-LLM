@@ -2,22 +2,21 @@ from langchain_community.chat_models import ChatOllama
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.prompts import FewShotChatMessagePromptTemplate
-from langchain_teddynote.messages import stream_response
 import os
 from dotenv import load_dotenv
+from typing import List
 
 load_dotenv()
 
 
-def gen_topic_by_words(topic: str):
+def gen_versus_by_topic(input_words: List[str]):
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
 
-    # TODO: 벡터 유사도로 example 고르기.
     examples = [
         {
-            "input": '["연애","자취","비밀번호"]',
-            "output": '["연애하는 사이에서, 연인에게 자취방 비밀번호를 알려줘도 되는가?","연애하는 사이에서 금전적 비용을 정확하게 따져야 하는가?","자취 생활 중에 연인을 자주 초대하는 것이 좋은가?","연인이 자취 중인 경우 동거처럼 되는 상황이 괜찮은가?","자취를 하면 연애가 더 쉬워지는가?"]',
+            "input": '"자취를 하면 연애가 더 쉬워지는가?"',
+            "output": '{"A": "쉬워진다", "B": "어려워진다"}',
         },
     ]
     # 요약을 위한 프롬프트 템플릿 정의
@@ -35,7 +34,7 @@ def gen_topic_by_words(topic: str):
         [
             (
                 "system",
-                "You're an AI that generates 5 debate topics in JSON array format based on given words, structured as A vs B scenarios.",
+                "You are an AI bot that generates arguments for both sides, A and B, based on the given debate topic and outputs them in JSON format.",
             ),
             few_shot_prompt,
             ("human", "{input}"),
@@ -43,4 +42,6 @@ def gen_topic_by_words(topic: str):
     )
 
     # stream_response(llm.stream(final_prompt.format_messages(input=input_words)))
-    return llm.invoke(final_prompt.format_messages(input=topic)).content
+    result = llm.invoke(final_prompt.format_messages(input=input_words)).content
+    print(result)
+    return result
