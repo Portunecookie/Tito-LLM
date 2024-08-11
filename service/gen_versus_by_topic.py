@@ -1,3 +1,4 @@
+import json
 from langchain_community.chat_models import ChatOllama
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,12 +12,12 @@ load_dotenv()
 
 def gen_versus_by_topic(input_words: List[str]):
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
 
     examples = [
         {
             "input": '"자취를 하면 연애가 더 쉬워지는가?"',
-            "output": '{"A": "쉬워진다", "B": "어려워진다"}',
+            "output": '{"A":"연애가 더 쉬워진다","B":"연애가 더 어려워진다"}',
         },
     ]
     # 요약을 위한 프롬프트 템플릿 정의
@@ -34,14 +35,17 @@ def gen_versus_by_topic(input_words: List[str]):
         [
             (
                 "system",
-                "You are an AI bot that generates arguments for both sides, A and B, based on the given debate topic and outputs them in JSON format.",
+                "You are an AI bot that generates arguments for both sides (A and B) of a given debate topic and outputs them in a JSON format, following the provided example.",
             ),
             few_shot_prompt,
             ("human", "{input}"),
         ]
     )
 
-    # stream_response(llm.stream(final_prompt.format_messages(input=input_words)))
     result = llm.invoke(final_prompt.format_messages(input=input_words)).content
-    print(result)
-    return result
+    print(f"Generated A, B : {result}")
+
+    try:
+        return json.loads(result)
+    except:
+        return result

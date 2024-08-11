@@ -1,3 +1,4 @@
+import json
 from langchain_community.chat_models import ChatOllama
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -20,27 +21,29 @@ def gen_topic_by_words(topic: str):
             "output": '["연애하는 사이에서, 연인에게 자취방 비밀번호를 알려줘도 되는가?","연애하는 사이에서 금전적 비용을 정확하게 따져야 하는가?","자취 생활 중에 연인을 자주 초대하는 것이 좋은가?","연인이 자취 중인 경우 동거처럼 되는 상황이 괜찮은가?","자취를 하면 연애가 더 쉬워지는가?"]',
         },
     ]
-    # 요약을 위한 프롬프트 템플릿 정의
     example_prompt = ChatPromptTemplate.from_messages(
         [("human", "{input}"), ("ai", "{output}")]
     )
 
-    # few shot prompt
     few_shot_prompt = FewShotChatMessagePromptTemplate(
         example_prompt=example_prompt, examples=examples
     )
 
-    # 최종 prompt
     final_prompt = ChatPromptTemplate.from_messages(
         [
             (
                 "system",
-                "You're an AI that generates 5 debate topics in JSON array format based on given words, structured as A vs B scenarios.",
+                "You are an AI bot that generates 5 debate topics that can be divided into an A vs B format, following the given example format, and outputs them in a JSON array format.",
             ),
             few_shot_prompt,
             ("human", "{input}"),
         ]
     )
 
-    # stream_response(llm.stream(final_prompt.format_messages(input=input_words)))
-    return llm.invoke(final_prompt.format_messages(input=topic)).content
+    result = llm.invoke(final_prompt.format_messages(input=topic)).content
+    print(f"Generated Topic : {result}")
+
+    try:
+        return json.loads(result)
+    except:
+        raise Exception("Failed to convert JSON")
