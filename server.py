@@ -8,7 +8,7 @@ from service.gen_topic_by_words import gen_topic_by_words
 app = FastAPI()
 
 
-@app.post("/data/A")
+@app.post("/generate-topic")
 async def post_concat_words(words: List[str] = Body(...)):
     topic_list = gen_topic_by_words(words)
     versus_list = []
