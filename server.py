@@ -10,6 +10,7 @@ app = FastAPI()
 
 @app.post("/generate-topic")
 async def post_concat_words(words: List[str] = Body(...)):
+    print(words)
     topic_list = gen_topic_by_words(words)
     versus_list = []
     for topic in topic_list:
@@ -32,4 +33,4 @@ async def echo_body(body: dict = Body(...)):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8977)
