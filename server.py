@@ -41,16 +41,4 @@ async def echo_body(body: dict = Body(...)):
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8977)
-
-    # Kuma Health Check
-    print("Starting Kuma Health Check")
-    while True:
-        try:
-            requests.get(
-                "https://kuma.owsla.duckdns.org/api/push/R9DEJUpsyt?status=up&msg=OK"
-            )
-        except Exception as e:
-            print(f"Request failed: {e}")
-        time.sleep(60)
