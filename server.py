@@ -28,8 +28,9 @@ async def post_concat_words(words: List[str] = Body(...)):
 
 
 @app.post("/refine-argument")
-async def post_refine_argument(argument: str = Body(...)):
-    data = refine_argument(argument)
+async def post_refine_argument(body: dict = Body(...)):
+    print(body["argument"])
+    data = refine_argument(body["argument"])
 
     return data
 
@@ -41,4 +42,5 @@ async def echo_body(body: dict = Body(...)):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8977)
